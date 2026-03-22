@@ -17,7 +17,7 @@ class SpotifyAPI:
     access_token: Optional[str]
     refresh_token: Optional[str]
 
-    def __init__(self, client_id: str, client_secret: str, listen_port: int):
+    def __init__(self, client_id: str, client_secret: str, listen_port: int, proxy: str):
         self.session = Session()
         self.access_token = None
         self.refresh_token = None
@@ -27,11 +27,13 @@ class SpotifyAPI:
         self.listen_port = listen_port
         self.client_id_header = "Basic " + base64.b64encode(f"{self.client_id}:{self.client_secret}".encode("utf-8")) \
             .decode("utf-8")
+        
+        self.proxies = {'http': proxy, 'https': proxy}
 
     @classmethod
     def new(
         cls, listen_port: int, client_id: Optional[str] = None, client_secret: Optional[str] = None,
-        keep: bool = False
+        keep: bool = False, proxy: Optional[str] = None
     ) -> Self:
 
         if os.path.exists("data.json"):
@@ -46,7 +48,7 @@ class SpotifyAPI:
         if client_id is None or client_secret is None:
             raise NoApiPairError
 
-        res = cls(listen_port=listen_port, client_id=client_id, client_secret=client_secret)
+        res = cls(listen_port=listen_port, client_id=client_id, client_secret=client_secret, proxy=proxy)
         if data:
             res.restore(data)
         else:
@@ -133,7 +135,7 @@ class SpotifyAPI:
             headers={
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Authorization": self.client_id_header
-            }
+            }, proxies=self.proxies
         )
         resp.raise_for_status()
         data = resp.json()
@@ -153,7 +155,7 @@ class SpotifyAPI:
             headers={
                 "Content-Type": "application/x-www-form-urlencoded",
                 "Authorization": self.client_id_header
-            }
+            }, proxies=self.proxies
         )
         resp.raise_for_status()
         data = resp.json()
@@ -168,7 +170,7 @@ class SpotifyAPI:
         resp = self.session.get(
             url,
             headers={"Authorization": f"Bearer {self.access_token}"},
-            params=params
+            params=params, proxies=self.proxies
         )
         resp.raise_for_status()
         return resp.json()

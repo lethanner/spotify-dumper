@@ -49,6 +49,9 @@ options:
                         Include additional playlists by their URI in the format spotify:playlist:<base62-encoded id>. Can be repeated for multiple playlists
   -x URI, --exclude URI
                         Exclude playlists by their URI in the format spotify:playlist:<base62-encoded id>. Can be repeated for multiple playlists. This option is evaluated last and overrides all other inclusion rules
+  -p PROXY, --proxy PROXY
+                        Connect to Spotify API through an HTTP(S) proxy (e.g. http://127.0.0.1:1080). Has no effect on your browser.
+                        You can also try using a SOCKS proxy if you know exactly which dependencies need to be installed.
 
 Get client ID and secret at https://developer.spotify.com/dashboard/applications.
 Add http://127.0.0.1:30700/callback to Redirect URIs in settings of your application.

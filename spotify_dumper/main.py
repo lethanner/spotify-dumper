@@ -99,7 +99,7 @@ def main() -> None:
     with console.status("Authorizing in spotify"):
         try:
             spotify = SpotifyAPI.new(
-                client_id=args.client_id, client_secret=args.client_secret, listen_port=args.listen_port, keep=args.keep
+                client_id=args.client_id, client_secret=args.client_secret, listen_port=args.listen_port, keep=args.keep, proxy=args.proxy
             )
         except NoApiPairError:
             console.print("No client id/secret provided! Use --client-id and --client-secret arguments.")
@@ -125,7 +125,7 @@ def main() -> None:
                     continue
                 try:
 
-                    playlist = spotify.get(f"/playlists/{uri.removeprefix("spotify:playlist:")}")
+                    playlist = spotify.get(f"/playlists/{uri.removeprefix('spotify:playlist:')}")
                 except HTTPError as e:
                     if e.response.status_code == 404:
                         console.print(f"Playlist {uri} does not exist!", style="red")
@@ -247,6 +247,11 @@ parser.add_argument(
     "--listen-port", dest="listen_port", type=int, default=30700,
     help="For advanced users. Change port of internal HTTP server that is responsible for taking auth code."
 )
+parser.add_argument(
+    "-p", "--proxy", dest="proxy", type=str,
+    help=   "Connect to Spotify API through an HTTP(S) proxy (e.g. http://127.0.0.1:1080). Has no effect on your browser.\n"
+            "You can also try using a SOCKS proxy if you know exactly which dependencies need to be installed."
+)
 
 # Output
 parser.add_argument("--overwrite", dest="overwrite", action="store_true", help="Overwrite destination file.")
@@ -275,7 +280,6 @@ parser.add_argument(
     "-x", "--exclude", dest="excluded_playlist_uris", action="append", metavar="URI",
     help="Exclude playlists by their URI in the format spotify:playlist:<base62-encoded id>. Can be repeated for multiple playlists. This option is evaluated last and overrides all other inclusion rules"
 )
-
 
 
 if __name__ == "__main__":
